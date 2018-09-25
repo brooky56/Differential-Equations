@@ -23,9 +23,10 @@ public class Main extends Application {
     public static XYChart.Series EM = new XYChart.Series();
     public static XYChart.Series IEM = new XYChart.Series();
     public static XYChart.Series RKM = new XYChart.Series();
+    public static XYChart.Series realF = new XYChart.Series();
 
-    public static int amountOut = 11;
-    //public static int amountOut = 21;
+    //public static int amountOut = 11;
+    public static int amountOut = 21;
 
     public static FileWriter writer;
 
@@ -41,24 +42,29 @@ public class Main extends Application {
         LineChart<Number, Number> numberLineChart = new LineChart<>(x, y);
         numberLineChart.setTitle("Integrable curve");
 
-        double a = 0.0, b = 1.0; //boards of interval
-        double h = 0.1; //step
+        double a = 2.0, b = 3.0; //boards of interval
+        double h = 0.05; //step
         int m = (int) ((b - a) / h); //separation times
 
         writer = new FileWriter("output.txt");
 
-        EM(h, m, 0.0, 2.0);
+        EM(h, m, 2.0, 3.0);
         numberLineChart.getData().add(EM);
         arrayListX.clear();
         arrayListY.clear();
         writer.write("---------------------------------------------------------------------------------------------------\n");
-        IEM(h, m, 0.0, 2.0);
+        IEM(h, m, 2.0, 3.0);
         numberLineChart.getData().add(IEM);
         arrayListX.clear();
         arrayListY.clear();
         writer.write("---------------------------------------------------------------------------------------------------\n");
-        RKM(h, m, 0.0, 2.0);
+        RKM(h, m, 2.0, 3.0);
         numberLineChart.getData().add(RKM);
+        arrayListX.clear();
+        arrayListY.clear();
+        writer.write("---------------------------------------------------------------------------------------------------\n");
+        //realFunc(2.0, 1.0);
+        //numberLineChart.getData().add(realF);
 
 
         writer.flush();
@@ -104,6 +110,35 @@ public class Main extends Application {
         }
 
         EM.setData(datas);
+
+    }
+
+    public static void realFunc(double initialX, double initialY) throws IOException {
+
+
+        realF.setName("Analytical solution");
+
+        ObservableList<XYChart.Data> datas = FXCollections.observableArrayList();
+
+
+        arrayListX.add(2.0);
+        for (int i = 1; i < 11; i++) {
+            arrayListX.add(arrayListX.get(i - 1) + 0.1);
+        }
+
+        for (int i = 0; i < 11; i++) {
+            arrayListY.add(realFunction(arrayListX.get(i)));
+        }
+
+
+        writer.write("realF_X: " + arrayListX.toString() + "\n");
+        writer.write("realF_Y: " + arrayListY.toString() + "\n");
+
+        for (int i = 0; i < 11; i++) {
+            datas.add(new XYChart.Data(arrayListX.get(i), arrayListY.get(i)));
+        }
+
+        realF.setData(datas);
 
     }
 
@@ -205,8 +240,11 @@ public class Main extends Application {
     //change this function to others
     public static double myFunction(double x, double y) {
 
-        return x * x - 3 * y - 3 * x * y + y * y;
+        return (1 + x) / (1 - y * y);
     }
 
+    public static double realFunction(double x) {
+        return -1 / (2 * x + 2 * x * x * x / 3 - 7);
+    }
 
 }
